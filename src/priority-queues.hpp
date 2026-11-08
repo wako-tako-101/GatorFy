@@ -1,22 +1,23 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include "Song.h"
 
 using namespace std;
 
-struct Song {
-    string title;
-    string primaryArtist;
-    string featuredArtist;
-    double tempo;
-    double loudness;
-    int harmonicKey;
-    int scaleMode;
-    int explicitStatus;
-    int timeSignature;
-    int releaseYear;
-    int recommendationScore = 0;
-};
+// struct Song {
+//     string title;
+//     string primaryArtist;
+//     string featuredArtist;
+//     double tempo;
+//     double loudness;
+//     int harmonicKey;
+//     int scaleMode;
+//     int explicitStatus;
+//     int timeSignature;
+//     int releaseYear;
+//     int recommendationScore = 0;
+// };
 
 class MaxHeap {
 private:

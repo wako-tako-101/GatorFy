@@ -1,4 +1,4 @@
-#include "../include/priority-queues.hpp"
+#include "priority-queues.hpp"
 
 MaxHeap::MaxHeap() {
     capacity = 10;
@@ -11,7 +11,7 @@ MaxHeap::~MaxHeap() {
 }
 
 void MaxHeap::heapifyUp(int i) {
-    while(i>0 && heap[parent(i)].recommendationScore < heap[i].recommendationScore) {
+    while(i>0 && heap[parent(i)].similarityScore < heap[i].similarityScore) {
         Song temp = heap[i];
         heap[i] = heap[parent(i)];
         heap[parent(i)] = temp;
@@ -24,11 +24,11 @@ void MaxHeap::heapifyDown(int i) {
     int left = leftChild(i);
     int right = rightChild(i);
 
-    if (left<currentSize && heap[left].recommendationScore > heap[maxIndex].recommendationScore) {
+    if (left<currentSize && heap[left].similarityScore > heap[maxIndex].similarityScore) {
         maxIndex = left;
     }
 
-    if(right<currentSize && heap[right].recommendationScore > heap[maxIndex].recommendationScore){
+    if(right<currentSize && heap[right].similarityScore > heap[maxIndex].similarityScore){
         maxIndex = right;
     }
 

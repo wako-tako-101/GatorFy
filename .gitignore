@@ -1,2 +1,3 @@
 build/
 tracks_features.csv
+*.exe
