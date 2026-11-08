@@ -2,6 +2,9 @@
 #include <chrono>
 #include <cstdlib>
 #include "../include/priority-queues.hpp"
+#include "RBT.h"
+#include "Song.h"
+#include "CSV_parser.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -14,8 +17,8 @@ int main() {
 
 	for(int i=0; i<numSongs; i++){
 		Song temp;
-		temp.title="Song " + to_string(i);
-		temp.recommendationScore=rand()%101;
+		temp.name="Song " + to_string(i);
+		temp.similarityScore=rand()%101;
 		heap.insert(temp);
 	}
 
@@ -36,7 +39,7 @@ int main() {
 	cout<<"Extract time: "<<dur2.count()<<" ms\n";
 
 	for(int i=0;i<actualK;i++){
-		cout<<i+1<<". "<<topRecs[i].title<<" - "<<topRecs[i].recommendationScore<<"\n";
+		cout<<i+1<<". "<<topRecs[i].name<<" - "<<topRecs[i].similarityScore<<"\n";
 	}
 
 	delete[] topRecs;
