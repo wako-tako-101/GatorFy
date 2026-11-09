@@ -25,11 +25,27 @@ vector<const Song*> searchSongs(const vector<Song>& songs, const string& songNam
 
 	for(const Song& song : songs){
 		if(song.name == songName) matches.push_back(&song);
-		if(matches.size() > numRecs) break;
+		if(matches.size() >= numRecs) break;
 	}
 	return matches;
 }
 
+//for showing song info
+void songInfo(const Song& song){
+	cout << "Song: " << song.name << "\n";
+	cout << "Artist(s): " << song.artists << "\n";
+	cout << "Album: " << song.album << "\n";
+	cout << "ID: " << song.id << "\n";
+
+	cout << "Song Details:\n";
+	cout << "Tempo: " << song.tempo << "\n";
+	cout << "Loudness: " << song.loudness << "\n";
+	cout << "Key: " << song.key << "\n";
+	cout << "Mode: " << (song.mode == 1 ? "Major" : song.mode == 0 ? "Minor" : "Unknown") << "\n";
+	cout << "Explicit Content: " << (song.explicitContent ? "Yes" : "No") << "\n";
+	cout << "Time Signature: " << song.timeSignature << "\n";
+	cout << "Release Year: " << song.year << "\n";
+}
 
 //MAIN MENU INPUT
 void printMenu(){
@@ -145,8 +161,18 @@ int main() {
 					break;
 				}
 
-				vector<const Song*> matches = searchSongs(songs, songName, numRecs);
-				
+				const vector<const Song*> matches = searchSongs(songs, songName, numRecs);
+				if(matches.empty()){
+					cerr << "No matches found for: " << songName << endl;
+					break;
+				}
+
+				cout << "Showing " << matches.size() << " matches for: " << songName << endl;
+				for (size_t i = 0; i < matches.size(); i++) {
+					cout << i + 1 << ". " 
+					<< matches[i]->name << ": " << matches[i]->artists 
+					<< " - Album: " << matches[i]->album << "\n";
+				}
 
 				break;
 			}
@@ -171,7 +197,7 @@ int main() {
 				}
 
 
-				vector<const Song*> matches = searchSongs(songs, songName, numRecs);
+				const vector<const Song*> matches = searchSongs(songs, songName, numRecs);
 
 				if(matches.empty()){
 					cerr << "No recommendations found for: " << songName << endl;
@@ -219,6 +245,40 @@ int main() {
 			}
 			case 3:{
 				// Song Information
+				cout << "Enter song name: ";
+				getline(cin, songName);
+
+				cout << "How many matching songs to display? (Between 1-100)\n";
+				int numRecs;
+					
+				if (!(cin >> numRecs)) {
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Please enter a valid number.\n";
+					break;
+				}
+				
+				if(numRecs < 1 || numRecs > 100){
+					cerr << "Invalid number of matching songs to display." << endl;
+					break;
+				}
+
+				 const vector<const Song*> matches = searchSongs(songs, songName, numRecs);
+
+				if(matches.empty()){
+					cerr << "No matches found for: " << songName << endl;
+					break;
+				}
+				else if(matches.size() == 1){
+
+					songInfo(*matches[0]);
+					break;
+				}
+
+				for(size_t i = 0; i < matches.size(); i++){
+					cout << i + 1 << ". ";
+					songInfo(*matches[i]);
+				}
 				break;
 			}
 			case 4:{
