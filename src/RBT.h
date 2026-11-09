@@ -46,6 +46,7 @@ public:
 
     void insert(const Song& song);
     void top_n(int n);
+    vector<Song> getTopN(int n);
 };
 
 #endif //GATORFY_RBT_H

@@ -5,6 +5,7 @@
 #include "Song.h"
 #include "CSV_parser.h"
 #include <limits>
+#include <iomanip>
 
 
 using namespace std;
@@ -63,7 +64,8 @@ void printMenu(){
 	<< "1. Song Search\n"
 	<< "2. Song Recommendations\n"
 	<< "3. Song Information\n"
-	<< "4. Exit\n" << endl;
+	<< "4. Data Structure Comparison\n"
+	<< "5. Exit\n" << endl;
 }
 
 int main() {
@@ -109,6 +111,7 @@ int main() {
 		return 1;
 	}
 	
+	auto start = high_resolution_clock::now();
 	const vector<Song>& songs = loadSongs("tracks_features.csv");
 
 	if(songs.empty()){
@@ -117,6 +120,9 @@ int main() {
 	}
 
 	cout << "Loaded " << songs.size() << " songs from CSV file." << endl;
+	auto stop = high_resolution_clock::now();
+	auto duration = duration_cast<milliseconds>(stop - start);
+	cout << "Loading time: " << duration.count() << " ms" << " (" << duration.count() / 1000.0 << " seconds)" << endl;
 	file.close();
 
 
@@ -282,6 +288,75 @@ int main() {
 				break;
 			}
 			case 4:{
+				// Data Structure Comparison
+				cout << "Comparing Max Heap and Red-Black Tree for top recommendations..." << endl;
+				cout << "Enter seed song name: ";
+				getline(cin, songName);
+
+				vector<const Song*> matches = searchSongs(songs, songName, 1);
+
+				if (matches.empty()) {
+					cerr << "Song not found!\n";
+					break;
+				}
+
+				const Song& seed = *matches[0];
+
+				cout << "How many Recommendations to display? (Between 1-100)\n";
+				int numRecs;
+				if (!(cin >> numRecs)) {
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Please enter a valid number.\n";
+					break;
+				}
+				if(numRecs < 1 || numRecs > 100){
+					cerr << "Invalid number of recommendations to display." << endl;
+					break;
+				}
+
+				vector<Song> candidates;
+				for (const Song& song : songs){
+					if(song.id == seed.id) continue;
+
+					Song candidate = song;
+					candidate.similarityScore = calculateSimilarity(seed, candidate);
+					candidates.push_back(candidate);
+				}
+
+				cout << "\nScored Candidates: " << candidates.size() << endl;	
+
+				// Compare Max Heap and Red-Black Tree
+				MaxHeap heap;
+				RBT tree;
+
+				for (const Song& candidate : candidates) {
+					heap.insert(candidate);
+					tree.insert(candidate);
+				}
+
+				//benchmarking
+				//heaps
+				auto heapStart = chrono::high_resolution_clock::now();
+				int actualK = 0;
+				Song* heapResults = heap.extractTopK(numRecs, actualK);
+				auto heapEnd = chrono::high_resolution_clock::now();
+
+				//rbts
+				auto treeStart = chrono::high_resolution_clock::now();
+				vector<Song> treeResults = tree.getTopN(numRecs);
+				auto treeEnd = chrono::high_resolution_clock::now();
+
+				double heapDuration = chrono::duration_cast<chrono::microseconds>(heapEnd - heapStart).count();
+				double treeDuration = chrono::duration_cast<chrono::microseconds>(treeEnd - treeStart).count();
+
+				cout << "Benchmarks: " << endl;
+				cout << "Heap Duration: " << heapDuration << " ms" << " (" << heapDuration / 1000.0 << " s)" << endl;
+				cout << "Red-Black Tree Duration: " << treeDuration << " ms" << " (" << treeDuration / 1000.0 << " s)" << endl;
+				delete[] heapResults;
+				break;
+			}
+			case 5:{
 				// Exit
 				cout << "Closing GatorFy..." << endl;	
 				return 0;

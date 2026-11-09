@@ -177,6 +177,16 @@ void RBT::top_n(int n) {
     }
 }
 
+vector<Song> RBT::getTopN(int n)
+{
+    vector<Song> results;
+
+    if(n <= 0) return results;
+    
+    top_n_helper(root, n, results);
+    return results;
+}
+
 RBT::~RBT() {
     destroy_helper(root);
 }
