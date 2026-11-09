@@ -214,7 +214,7 @@ int main() {
 
 				const Song& seed = *matches[0];
 
-				//use rbts and max heap to efficiently dfind similar songs
+				//use rbts and max heap to efficiently find similar songs
 				MaxHeap heap;
 				RBT tree;
 
@@ -284,6 +284,7 @@ int main() {
 				for(size_t i = 0; i < matches.size(); i++){
 					cout << i + 1 << ". ";
 					songInfo(*matches[i]);
+					cout << endl;
 				}
 				break;
 			}
@@ -336,25 +337,44 @@ int main() {
 				}
 
 				//benchmarking
-				//heaps
-				auto heapStart = chrono::high_resolution_clock::now();
+				//max heap
+				auto heapStart = chrono::steady_clock::now();
+
 				int actualK = 0;
 				Song* heapResults = heap.extractTopK(numRecs, actualK);
-				auto heapEnd = chrono::high_resolution_clock::now();
 
-				//rbts
-				auto treeStart = chrono::high_resolution_clock::now();
+				auto heapEnd = chrono::steady_clock::now();
+
+				//rbt
+				auto treeStart = chrono::steady_clock::now();
+
 				vector<Song> treeResults = tree.getTopN(numRecs);
-				auto treeEnd = chrono::high_resolution_clock::now();
 
-				double heapDuration = chrono::duration_cast<chrono::microseconds>(heapEnd - heapStart).count();
-				double treeDuration = chrono::duration_cast<chrono::microseconds>(treeEnd - treeStart).count();
+				auto treeEnd = chrono::steady_clock::now();
 
-				cout << "Benchmarks: " << endl;
-				cout << "Heap Duration: " << heapDuration << " ms" << " (" << heapDuration / 1000.0 << " s)" << endl;
-				cout << "Red-Black Tree Duration: " << treeDuration << " ms" << " (" << treeDuration / 1000.0 << " s)" << endl;
+				double heapDuration = chrono::duration<double, nano>(heapEnd - heapStart).count();
+				double treeDuration = chrono::duration<double, nano>(treeEnd - treeStart).count();
+
+				// Display results
+				cout << fixed << setprecision(3);
+
+				cout << "\nBenchmarks:\n";
+				cout << "Heap Duration: " << heapDuration << " ns (" << heapDuration / 1000000.0 << " ms)\n";
+
+				cout << "Red-Black Tree Duration: " << treeDuration	<< " ns (" << treeDuration / 1000000.0 << " ms)\n";
+
+				cout << "\nHeap Results: " << actualK << endl;
+				cout << "Tree Results: " << treeResults.size() << endl;
+
+				// Display a sample result so computation is observable
+				if (actualK > 0) {
+					cout << "Heap Top Song: " << heapResults[0].name << " - Score: " << heapResults[0].similarityScore	<< endl;
+				}
+
+				if (!treeResults.empty()) {
+					cout << "RBT Top Song: " << treeResults[0].name	<< " - Score: " << treeResults[0].similarityScore << endl;
+				}
 				delete[] heapResults;
-				break;
 			}
 			case 5:{
 				// Exit
