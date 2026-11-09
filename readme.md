@@ -1,5 +1,5 @@
-Gatorfy 
-Gatorfy is a C++ music recommendation program that identifies songs similar to a user-selected track using acoustic characteristics and metadata. It also compares two data structures—a Max Heap and a Red-Black Tree—for ranking and retrieving recommendations efficiently.
+
+Gatorfy is a C++ music recommendation program that identifies songs similar to a user-selected track using acoustic characteristics and metadata. It also compares two data structures. Max Heap and a Red-Black Tree—for ranking and retrieving recommendations efficiently.
 Features
 - Search for a song by title in a large music dataset.
 - Compare a selected song against other tracks using artist and acoustic metadata.
