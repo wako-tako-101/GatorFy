@@ -22,6 +22,8 @@ include_directories(src)
 add_executable(Main
         src/main.cpp
         src/priority-queues.cpp
+        src/RBT.cpp
+        src/Song.cpp
         # add your own header files below - should be automatically added in CLion
         # example (can also separate with newlines):
         # src/AVL.h src/AVL.cpp
@@ -31,6 +33,8 @@ add_executable(Main
 add_executable(Tests
         test/test.cpp
         src/priority-queues.cpp
+        src/RBT.cpp
+        src/Song.cpp
         # add your own header files below - should be automatically added in CLion
         # example (can also separate with newlines):
         # src/AVL.h src/AVL.cpp

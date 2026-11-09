@@ -28,5 +28,7 @@ struct Song {
     double similarityScore = 0.0;
 };
 
+double calculateSimilarity(const Song& song1, const Song& song2);
+
 #endif
 
