@@ -19,6 +19,17 @@ void whitespaceGenerator(const int& n){
 	for(int i = 0; i < n; i++) cout << ' ';
 }
 
+//for searches
+vector<const Song*> searchSongs(const vector<Song>& songs, const string& songName, int numRecs){
+	vector<const Song*> matches;
+
+	for(const Song& song : songs){
+		if(song.name == songName) matches.push_back(&song);
+		if(matches.size() > numRecs) break;
+	}
+	return matches;
+}
+
 
 //MAIN MENU INPUT
 void printMenu(){
@@ -100,11 +111,15 @@ int main() {
 
 		//if invalid input, close program
 		if(!(cin >> userOption)){
+			if(cin.eof()) break;
+
 			cin.clear();
 			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			cerr << "Invalid input. Please enter a number." << endl;
 			continue;
 		}
+
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 		string songName;
 
@@ -115,34 +130,91 @@ int main() {
 				cout << "Enter song name: ";
 				getline(cin, songName);
 
+				cout << "How many recommendations? (Between 1-100)\n";
+				int numRecs;
+					
+				if (!(cin >> numRecs)) {
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Please enter a valid number.\n";
+					break;
+				}
 				
+				if(numRecs < 1 || numRecs > 100){
+					cerr << "Invalid number of recommendations." << endl;
+					break;
+				}
 
+				vector<const Song*> matches = searchSongs(songs, songName, numRecs);
+				
 
 				break;
 			}
 			case 2: {
-				// Song Recommendations
-				cout << "Enter song name: ";
-				getline(cin, songName);
+					// Song Recommendations
+					cout << "Enter song name: ";
+					getline(cin, songName);
 
-				cout << "How many recommendations? (Between 1-100)\n";
-				int numRecs;
-				cin >> numRecs;
+					cout << "How many recommendations? (Between 1-100)\n";
+					int numRecs;
+					
+				if (!(cin >> numRecs)) {
+					cin.clear();
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					cout << "Please enter a valid number.\n";
+					break;
+				}
 				
-			if (!(cin >> numRecs)) {
-				cin.clear();
-				cin.ignore(numeric_limits<streamsize>::max(), '\n');
-				cout << "Please enter a valid number.\n";
-				break;
-			}
-			
-			if(numRecs < 1 || numRecs > 100){
-				cerr << "Invalid number of recommendations." << endl;
-				break;
-			}
+				if(numRecs < 1 || numRecs > 100){
+					cerr << "Invalid number of recommendations." << endl;
+					break;
+				}
 
+
+				vector<const Song*> matches = searchSongs(songs, songName, numRecs);
+
+				if(matches.empty()){
+					cerr << "No recommendations found for: " << songName << endl;
+					break;
+				}
 
 				cout << "Showing " << numRecs << " recommendations for: " << songName << endl;
+
+				const Song& seed = *matches[0];
+
+				//use rbts and max heap to efficiently dfind similar songs
+				MaxHeap heap;
+				RBT tree;
+
+				for(const Song& song : songs){
+					//skip the original song
+					if(&song == &seed || song.id == seed.id) continue;
+
+					//find feasible recs
+					Song candidate = song;
+					candidate.similarityScore = calculateSimilarity(seed, candidate);
+
+					//insert into both structs
+					heap.insert(candidate);
+					tree.insert(candidate);
+				}
+
+				//extract top numRecs similar songs from the heap
+				int k = 0;
+				Song* topRecs = heap.extractTopK(numRecs, k);
+
+				//print top recommendations (Max Heap)
+				cout << "Max Heap Recommendations:" << endl;
+
+				for (int i = 0; i < k; i++) {
+					cout << i + 1 << ". " << topRecs[i].name << ": " << topRecs[i].artists << " - Similarity Score: " << topRecs[i].similarityScore << "/100\n";
+				}
+
+				delete[] topRecs;
+
+				//print top recommendations (Red-Black Tree)
+				cout << "Red-Black Tree Recommendations:" << endl;
+				tree.top_n(numRecs);
 				break;
 			}
 			case 3:{
